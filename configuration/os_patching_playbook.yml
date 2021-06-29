@@ -1,8 +1,8 @@
 ---
 - name: OS patching
   hosts: all
-  vars:
-    repo_date: 2021-06-02
+  vars_files:
+    - ansible_vars.yml
   tasks:
     - name: Check REPO_DATE for os patching
       debug:
@@ -12,7 +12,7 @@
       register: BEFORE_VERSIONS
     - name: download the local repo file
       get_url:
-        url: http://tradeprod-rhel-local-repos.s3-website-us-east-1.amazonaws.com/RHEL7/{{ repo_date }}/rhel-local.repo
+        url: http://{{ repo_location }}/RHEL7/{{ repo_date }}/rhel-local.repo
         dest: /etc/yum.repos.d/rhel-local.repo
     # - name: Clear old cache for all repos
     # - name: Check if the new repo is recognized by yum
