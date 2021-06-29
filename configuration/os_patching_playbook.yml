@@ -1,7 +1,27 @@
 ---
-- hosts: all
-  roles:
-    - check_versions
-    - { name: os_patching, become: yes }
-    # - reboot
-    - validate_patching
+- name: OS patching
+  hosts: all
+  vars:
+    repo_date: 2021-06-02
+  tasks:
+    - name: Check REPO_DATE for os patching
+      debug:
+        msg: OS Patching starting for {{ repo_date }}
+    - name: Check OS information before patching
+      patching_info:
+      register: BEFORE_VERSIONS
+    - name: download the local repo file
+      get_url:
+        url: http://tradeprod-rhel-local-repos.s3-website-us-east-1.amazonaws.com/RHEL7/{{ repo_date }}/rhel-local.repo
+        dest: /etc/yum.repos.d/rhel-local.repo
+    # - name: Clear old cache for all repos
+    # - name: Check if the new repo is recognized by yum
+    # - name: Update using only local repo
+    # - name: Update AWS CLI
+    # - name: Reboot instance
+    - name: Check System Information after OS patching
+      patching_info:
+      register: AFTER_VERSIONS
+    - name: Print Validation results
+      debug:
+        msg: Previous Versions {{ BEFORE_VERSIONS }}, Patched Versions {{ AFTER_VERSIONS }}

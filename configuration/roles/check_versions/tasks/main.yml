@@ -1,8 +1,0 @@
----
-# tasks file for check_versions
-- name: Check current Kernal version
-  shell: "uname -a"
-  register: KERNAL_VERSION_BEFORE_PATCHING
-- name: Check current AWS CLI version
-  shell: "aws --version"
-  register: AWSCLI_VERSION_BEFORE_PATCHING

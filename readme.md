@@ -15,3 +15,6 @@ Instructions are on CLDWRK-9 ticket
 Update following variables on Terraform Plan
 - base_ami_id
 - new_ami_name
+
+## Run ansible playbook independantly
+    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u {{ user name }} -i '{{ public ip }},' --private-key {{ private key file }} -e {{ repo date }} {{ playbook name }}
