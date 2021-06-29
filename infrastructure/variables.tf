@@ -39,11 +39,6 @@ variable "new_ami_name" {
 }
 
 
-variable "script_name" {
-    type = string
-    description = "Script file to execute"  
-}
-
 variable "private_key_file" {
     type = string
     description = "Private key file to SSH"  

@@ -3,3 +3,4 @@ backup/
 **/*.tfvars
 **/.terraform/
 **/*.lock.hcl
+**/hosts

@@ -1,6 +1,6 @@
 # Create AMI-Master instance to setup Promtail
 
-resource "aws_instance" "ustockdev-gen2-reactor-AMI-master-promtail" {
+resource "aws_instance" "ustockdev-gen2-reactor-AMI-master" {
     ami = var.base_ami_id
     instance_type = var.machine_type
     key_name = var.machine_key
@@ -15,9 +15,9 @@ resource "aws_instance" "ustockdev-gen2-reactor-AMI-master-promtail" {
 }
 
 output "Master_Machine-ID" {
-  value = aws_instance.ustockdev-gen2-reactor-AMI-master-promtail.id
+  value = aws_instance.ustockdev-gen2-reactor-AMI-master.id
 }
 
 output "Master_Machine-Public_IP" {
-  value = aws_instance.ustockdev-gen2-reactor-AMI-master-promtail.public_ip
+  value = aws_instance.ustockdev-gen2-reactor-AMI-master.public_ip
 }
