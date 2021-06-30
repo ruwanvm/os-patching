@@ -1,8 +1,8 @@
 ---
-- name: OS patching
+- name: Pre-Patching tasks
   hosts: all
-  vars_files:
-    - ansible_vars.yml
+  vars:
+    repo_date: repo-date
   tasks:
     - name: Check REPO_DATE for os patching
       debug:
@@ -10,15 +10,93 @@
     - name: Check OS information before patching
       patching_info:
       register: BEFORE_VERSIONS
+
+- name: Patching tasks
+  hosts: all
+  vars:
+    repo_location: repo-location    
+  tasks:
+
+    # wget -O /etc/yum.repos.d/rhel-local.repo http://http://{{ repo_location }}/{{ repo_date }}/rhel-local.repo
     - name: download the local repo file
+      become: yes
       get_url:
-        url: http://{{ repo_location }}/RHEL7/{{ repo_date }}/rhel-local.repo
+        url: http://{{ repo_location }}/{{ repo_date }}/rhel-local.repo
         dest: /etc/yum.repos.d/rhel-local.repo
-    # - name: Clear old cache for all repos
-    # - name: Check if the new repo is recognized by yum
-    # - name: Update using only local repo
-    # - name: Update AWS CLI
-    # - name: Reboot instance
+
+    # yum --enablerepo="*" clean all
+    - name: Clear old cache for all repos
+      become: yes
+      shell:
+        cmd: yum --enablerepo="*" clean all
+
+    # yum --disablerepo="*" --enablerepo="rhel_local" repolist
+    - name: Check if the new repo is recognized by yum
+      become: yes
+      shell:
+        cmd: yum --disablerepo="*" --enablerepo="rhel_local" repolist
+      register: REPO_LIST
+    - debug: var=REPO_LIST['stdout_lines']
+
+    # yum -y --disablerepo="*" --enablerepo="rhel_local" update
+    - name: Update using only local repo
+      become: yes
+      shell:
+        cmd: yum -y --disablerepo="*" --enablerepo="rhel_local" update
+
+    # pip install --upgrade pip --user
+    - name: Upgrade PIP
+      pip:
+        name: pip
+        state: latest
+        extra_args: --user
+
+    # # pip install awscli --upgrade --user
+    - name: Upgrade AWSCLI to latest version
+      pip:
+        name: awscli
+        state: latest
+        extra_args: --user
+
+- name: Post-Patching tasks
+  hosts: localhost
+  vars:
+    instance_id: instance-id
+    public_ip: public-ip
+    region: region
+  tasks:
+    # aws ec2 reboot-instances --instance-ids {{ instance_id }}
+    - name: Reboot instance
+      ec2:
+        instance_ids: '{{ instance_id }}'
+        state: restarted
+        region: '{{ region }}'
+    
+    # aws ec2 wait instance-status-ok --instance-ids {{ instance_id }}
+    - name: Wait until instance reboot
+      wait_for:
+        host: '{{ public_ip }}'
+        port: 22
+        state: started
+        delay: 30
+
+- name: Validation tasks
+  hosts: all
+  vars:
+    repo_location: repo-location
+    repo_date: repo-date
+  become: yes
+  tasks:
+    #  package-cleanup --oldkernels --count=1
+    - name: Remove old kernels
+      shell:
+        cmd: package-cleanup --oldkernels --count=1 -y
+
+    # yum --enablerepo="*" clean all
+    - name: clear repo cache
+      shell:
+        cmd: yum --enablerepo="*" clean all
+
     - name: Check System Information after OS patching
       patching_info:
       register: AFTER_VERSIONS

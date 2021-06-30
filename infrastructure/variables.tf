@@ -35,11 +35,21 @@ variable "machine_name" {
 
 variable "new_ami_name" {
     type = string
-    description = "Name of the Master machine"  
+    description = "Name of the AMI after os-patching"  
 }
 
 
 variable "private_key_file" {
     type = string
     description = "Private key file to SSH"  
+}
+
+variable "repo_location" {
+    type = string
+    description = "Location of the repocitory for os-patching" 
+}
+
+variable "repo_date" {
+    type = string
+    description = "Repo date provided with the os-patching instruction"  
 }
