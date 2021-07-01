@@ -4,3 +4,4 @@ backup/
 **/.terraform/
 **/*.lock.hcl
 **/hosts
+run.sh

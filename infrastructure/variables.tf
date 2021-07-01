@@ -53,3 +53,8 @@ variable "repo_date" {
     type = string
     description = "Repo date provided with the os-patching instruction"  
 }
+
+variable "region" {
+    type = string
+    description = "AWS region to create new AMI"  
+}
