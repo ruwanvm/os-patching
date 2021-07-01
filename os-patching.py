@@ -131,14 +131,18 @@ def main():
         answers['new_ami_name'] = f"ustockdev-{answers['generation'].lower()}-{answers['app_type']}-AMI-patching-{answers['year']}-{answers['frequency']}"
 
         del answers['confirmation']
-        del answers['year']
-        del answers['frequency']
-        del answers['app_type']
-        del answers['generation']
+
+        os.environ["PATCH_YEAR"] = str(answers.pop('year', None))
+        os.environ["PATCH_FREQUENCY"] = str(answers.pop('frequency', None))
+        os.environ["PATCH_TYPE"] = str(answers.pop('app_type', None))
+        os.environ["PATCH_GEN"] = str(answers.pop('generation', None))
 
         with open(join('infrastructure', 'terraform.tfvars'), mode="w") as tfvars_file:
             for key in answers:
                 tfvars_file.write(f'{key} = "{answers[key]}"\n')
+        
+        
+
 
 if __name__ == '__main__':
     main()
